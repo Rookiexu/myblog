@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<!-- 定义数据源 -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://localhost/rxblog</value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value></value>
+		</property>
+	</bean>
+		<!-- 定义SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource"/>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>cn/rookiex/po/User.hbm.xml</value>
+				<value>cn/rookiex/po/BlogInfo.hbm.xml</value>
+				<value>cn/rookiex/po/Article.hbm.xml</value>
+				<value>cn/rookiex/po/Critique.hbm.xml</value>
+				<value>cn/rookiex/po/Note.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+		<!-- 定义HibernateTemplate -->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/>
+		</property>
+	</bean>
+	
+	<!-- 配置DAO组件 -->
+	<bean id="userDAO" class="cn.rookiex.dao.UserDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 配置业务逻辑组件 -->
+	<bean id="userService" class="cn.rookiex.service.UserServiceImpl">
+		<property name="userDAO">
+			<ref bean="userDAO"/>
+		</property>
+	</bean>
+		<!-- 配置registerAction -->
+	<bean id="registerAction" class="cn.rookiex.action.Register" scope="prototype">
+		<property name="userService">
+			<ref bean="userService"/>
+		</property>
+	</bean>
+	<!-- 配置loginAction -->
+	<bean id="loginAction" class="cn.rookiex.action.Login" scope="prototype">
+		<property name="userService">
+			<ref bean="userService"/>
+		</property>
+	</bean>
+	<!-- 配置DAO组件 -->
+	<bean id="blogInfoDAO" class="cn.rookiex.dao.BlogInfoDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 配置业务逻辑组件 -->
+	<bean id="blogInfoService" class="cn.rookiex.service.BlogInfoServiceImpl">
+		<property name="blogInfoDAO">
+			<ref bean="blogInfoDAO"/>
+		</property>
+	</bean>
+	<!-- 配置editBlogInfoAction -->
+	<bean id="editBlogInfo" class="cn.rookiex.action.EditBlogInfo" scope="prototype">
+		<property name="blogInfoService">
+			<ref bean="blogInfoService"/>
+		</property>
+	</bean>
+	<!-- 配置getBlogInfoAction -->
+	<bean id="getBlogInfo" class="cn.rookiex.action.GetBlogInfo" scope="prototype">
+		<property name="blogInfoService">
+			<ref bean="blogInfoService"/>
+		</property>
+	</bean>
+	
+	<!-- 配置DAO组件 -->
+	<bean id="articleDAO" class="cn.rookiex.dao.ArticleDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 配置业务逻辑组件 -->
+	<bean id="articleService" class="cn.rookiex.service.ArticleServiceImpl">
+		<property name="articleDAO">
+			<ref bean="articleDAO"/>
+		</property>
+
+		<property name="critiqueDAO">
+			<ref bean="critiqueDAO"/>
+		</property>
+	</bean>
+		<!-- AddArticle Action -->
+	<bean id="addArticle" class="cn.rookiex.action.AddArticle">
+		<property name="articleService">
+			<ref bean="articleService"/>
+		</property>
+	</bean>
+		<!-- ShowUserAllArticle Action -->
+	<bean id="showUserAllArticle" class="cn.rookiex.action.ShowUserAllArticle">
+		<property name="articleService">
+			<ref bean="articleService"/>
+		</property>
+	</bean>
+	
+	<!-- ShowAllArticle Action -->
+	<bean id="showAllArticle" class="cn.rookiex.action.ShowAllArticle">
+		<property name="articleService">
+			<ref bean="articleService"/>
+		</property>
+	</bean>
+	<!-- ShowArticle Action -->
+	<!-- ShowArticle Action -->
+	<bean id="showArticle" class="cn.rookiex.action.ShowArticle">
+		<property name="articleService">
+			<ref bean="articleService"/>
+		</property>
+		<property name="critiqueService">
+			<ref bean="critiqueService"/>
+		</property>
+	</bean>
+
+	<!-- 配置critiqueDAO -->
+	<bean id="critiqueDAO" class="cn.rookiex.dao.CritiqueDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 配置critiqueService -->
+	<bean id="critiqueService" class="cn.rookiex.service.CritiqueServiceImpl">
+		<property name="critiqueDAO">
+			<ref bean="critiqueDAO"/>
+		</property>
+	</bean>
+	
+	<!-- AddCritique Action -->
+	<bean id="addCritique" class="cn.rookiex.action.AddCritique">
+		<property name="userService">
+			<ref bean="userService"/>
+		</property>
+		<property name="critiqueService">
+			<ref bean="critiqueService"/>
+		</property>
+	</bean>
+	
+	<!-- 配置NoteDAO -->
+	<bean id="noteDAO" class="cn.rookiex.dao.NoteDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 配置NoteService -->
+	<bean id="noteService" class="cn.rookiex.service.NoteServiceImpl">
+		<property name="noteDAO">
+			<ref bean="noteDAO"/>
+		</property>
+	</bean>
+	
+	<!-- AddCritique Action -->
+	<bean id="addNote" class="cn.rookiex.action.AddNote">
+		<property name="noteService">
+			<ref bean="noteService"/>
+		</property>
+		<property name="userService">
+			<ref bean="userService"/>
+		</property>
+	</bean>
+	
+		<!-- ShowUserAllNote Action -->
+	<bean id="showUserAllNote" class="cn.rookiex.action.ShowUserAllNote">
+		<property name="noteService">
+			<ref bean="noteService"/>
+		</property>
+	</bean>
+		<!-- ShowAllNote Action -->
+	<bean id="showAllNote" class="cn.rookiex.action.ShowUserAllNote">
+		<property name="noteService">
+			<ref bean="noteService"/>
+		</property>
+	</bean>
+</beans>
